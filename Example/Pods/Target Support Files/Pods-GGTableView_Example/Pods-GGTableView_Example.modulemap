@@ -1,0 +1,6 @@
+framework module Pods_GGTableView_Example {
+  umbrella header "Pods-GGTableView_Example-umbrella.h"
+
+  export *
+  module * { export * }
+}

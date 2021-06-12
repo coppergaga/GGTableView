@@ -9,7 +9,7 @@
 Pod::Spec.new do |s|
   s.name             = 'GGTableView'
   s.version          = '0.1.0'
-  s.summary          = 'A short description of GGTableView.'
+  s.summary          = 'This pod just provides a simpler, maybe, way to use UITableView.'
 
 # This description is used to generate tags and improve search results.
 #   * Think: What does it do? Why did you write it? What is the focus?
@@ -18,7 +18,7 @@ Pod::Spec.new do |s|
 #   * Finally, don't worry about the indent, CocoaPods strips it!
 
   s.description      = <<-DESC
-TODO: Add long description of the pod here.
+                      GGTableView centralizes the management logic for the cell, aims to privide a modular way to use UITableView
                        DESC
 
   s.homepage         = 'https://github.com/coppergaga/GGTableView'
@@ -28,9 +28,11 @@ TODO: Add long description of the pod here.
   s.source           = { :git => 'https://github.com/coppergaga/GGTableView.git', :tag => s.version.to_s }
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
-  s.ios.deployment_target = '9.0'
+  s.ios.deployment_target = '10.0'
+  s.swift_versions = ['5.0']
 
   s.source_files = 'GGTableView/Classes/**/*'
+  s.requires_arc = true
   
   # s.resource_bundles = {
   #   'GGTableView' => ['GGTableView/Assets/*.png']

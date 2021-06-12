@@ -1,0 +1,6 @@
+framework module GGTableView {
+  umbrella header "GGTableView-umbrella.h"
+
+  export *
+  module * { export * }
+}

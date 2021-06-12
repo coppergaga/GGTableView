@@ -1,9 +1,10 @@
 use_frameworks!
 
-platform :ios, '9.0'
+platform :ios, '12.0'
 
 target 'GGTableView_Example' do
   pod 'GGTableView', :path => '../'
+  pod 'SnapKit', '~> 5.0.0'
 
   target 'GGTableView_Tests' do
     inherit! :search_paths
