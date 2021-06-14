@@ -312,11 +312,7 @@ open class GGTableViewRow: GGNodeProtocol {
         }
     }
     
-    public var isVisiable = false {
-        didSet {
-            print(indexPath, "====", isVisiable)
-        }
-    }
+    public var isVisiable = false
 }
 
 //MARK:- section
