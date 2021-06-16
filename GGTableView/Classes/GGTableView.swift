@@ -124,7 +124,7 @@ extension GGTableViewDelegateProxy {
             return
         }
         if let tv = scrollView as? UITableView, let proxy = tv.delegate as? GGTableViewDelegateProxy {
-            let _ = proxy.dataSource.allRows
+            _ = proxy.dataSource.allRows
                         .compactMap { $0.isVisiable ? $0.scrollViewDidScroll?(scrollView, nil) : nil }
         }
     }
@@ -134,7 +134,7 @@ extension GGTableViewDelegateProxy {
             return
         }
         if let tv = scrollView as? UITableView, let proxy = tv.delegate as? GGTableViewDelegateProxy {
-            let _ = proxy.dataSource.allRows
+            _ = proxy.dataSource.allRows
                         .compactMap { $0.isVisiable ? $0.scrollViewWillBeginDragging?(scrollView, nil) : nil }
         }
     }
@@ -144,7 +144,7 @@ extension GGTableViewDelegateProxy {
             return
         }
         if let tv = scrollView as? UITableView, let proxy = tv.delegate as? GGTableViewDelegateProxy {
-            let _ = proxy.dataSource.allRows
+            _ = proxy.dataSource.allRows
                         .compactMap { $0.isVisiable ? $0.scrollViewDidEndDragging?(scrollView, nil) : nil }
         }
     }
@@ -154,7 +154,7 @@ extension GGTableViewDelegateProxy {
             return
         }
         if let tv = scrollView as? UITableView, let proxy = tv.delegate as? GGTableViewDelegateProxy {
-            let _ = proxy.dataSource.allRows
+            _ = proxy.dataSource.allRows
                         .compactMap { $0.isVisiable ? $0.scrollViewWillBeginDecelerating?(scrollView, nil) : nil }
         }
     }
@@ -164,7 +164,7 @@ extension GGTableViewDelegateProxy {
             return
         }
         if let tv = scrollView as? UITableView, let proxy = tv.delegate as? GGTableViewDelegateProxy {
-            let _ = proxy.dataSource.allRows
+            _ = proxy.dataSource.allRows
                         .compactMap { $0.isVisiable ? $0.scrollViewDidEndDecelerating?(scrollView, nil) : nil }
         }
     }
