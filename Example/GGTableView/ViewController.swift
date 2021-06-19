@@ -48,6 +48,11 @@ class ViewController: UIViewController {
                 row.scrollViewDidScroll = { (scrollView, decelerate) in
                     print("receive scrollview did scroll msg")
                 }
+                row.titleForDeleteConfirmationButton = "删除"
+                row.commitEditingStyle = { view, style, path in
+
+                }
+                row.canEditRow = true
             }
             row.didSelectRow = {[unowned self] (tv, cell, idxPath) in
                 self.navigationController?.pushViewController(ViewController(), animated: true)

@@ -12,7 +12,7 @@ import Swift
 public typealias GGTableViewProxyBlock = (UITableView, UITableViewCell?, IndexPath) -> Void
 public typealias GGTableViewScrollBlock = (UIScrollView, Bool?) -> Void
 
-//MARK:- datasource
+// MARK:- datasource
 open class GGTableViewDelegateProxy: NSObject {
     open var dataSource = GGTableViewDataSource()
     
@@ -20,7 +20,7 @@ open class GGTableViewDelegateProxy: NSObject {
     
     public weak var tableView: UITableView? {
         didSet {
-            dataSource.tableView = self.tableView
+            dataSource.tableView = tableView
         }
     }
     
@@ -53,8 +53,8 @@ extension GGTableViewDelegateProxy: UITableViewDelegate {
     
     public func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         let row = findRow(at: indexPath)
-        if !row.isVisiable {
-            row.isVisiable = true
+        if !row.isVisible {
+            row.isVisible = true
         }
         if let willDisplayBlock = row.willDisplayCell {
             willDisplayBlock(tableView, cell, indexPath)
@@ -63,8 +63,8 @@ extension GGTableViewDelegateProxy: UITableViewDelegate {
     
     public func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         let row = findRow(at: indexPath)
-        if row.isVisiable {
-            row.isVisiable = false
+        if row.isVisible {
+            row.isVisible = false
         }
         if let endDisplayingBlock = row.didEndDisplayingCell {
             endDisplayingBlock(tableView, cell, indexPath)
@@ -96,6 +96,11 @@ extension GGTableViewDelegateProxy: UITableViewDelegate {
         }
         return sec.footerHeight
     }
+
+    public func tableView(_ tableView: UITableView, titleForDeleteConfirmationButtonForRowAt indexPath: IndexPath) -> String? {
+        let row = findRow(at: indexPath)
+        return row.titleForDeleteConfirmationButton
+    }
 }
 
 extension GGTableViewDelegateProxy: UITableViewDataSource {
@@ -116,6 +121,16 @@ extension GGTableViewDelegateProxy: UITableViewDataSource {
         }
         return cell
     }
+
+    public func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        let row = findRow(at: indexPath)
+        return row.canEditRow
+    }
+
+    public func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        let row = findRow(at: indexPath)
+        row.commitEditingStyle?(tableView, editingStyle, indexPath)
+    }
 }
 
 extension GGTableViewDelegateProxy {
@@ -125,7 +140,7 @@ extension GGTableViewDelegateProxy {
         }
         if let tv = scrollView as? UITableView, let proxy = tv.delegate as? GGTableViewDelegateProxy {
             _ = proxy.dataSource.allRows
-                        .compactMap { $0.isVisiable ? $0.scrollViewDidScroll?(scrollView, nil) : nil }
+                        .compactMap { $0.isVisible ? $0.scrollViewDidScroll?(scrollView, nil) : nil }
         }
     }
     
@@ -135,7 +150,7 @@ extension GGTableViewDelegateProxy {
         }
         if let tv = scrollView as? UITableView, let proxy = tv.delegate as? GGTableViewDelegateProxy {
             _ = proxy.dataSource.allRows
-                        .compactMap { $0.isVisiable ? $0.scrollViewWillBeginDragging?(scrollView, nil) : nil }
+                        .compactMap { $0.isVisible ? $0.scrollViewWillBeginDragging?(scrollView, nil) : nil }
         }
     }
 
@@ -145,7 +160,7 @@ extension GGTableViewDelegateProxy {
         }
         if let tv = scrollView as? UITableView, let proxy = tv.delegate as? GGTableViewDelegateProxy {
             _ = proxy.dataSource.allRows
-                        .compactMap { $0.isVisiable ? $0.scrollViewDidEndDragging?(scrollView, nil) : nil }
+                        .compactMap { $0.isVisible ? $0.scrollViewDidEndDragging?(scrollView, nil) : nil }
         }
     }
 
@@ -155,7 +170,7 @@ extension GGTableViewDelegateProxy {
         }
         if let tv = scrollView as? UITableView, let proxy = tv.delegate as? GGTableViewDelegateProxy {
             _ = proxy.dataSource.allRows
-                        .compactMap { $0.isVisiable ? $0.scrollViewWillBeginDecelerating?(scrollView, nil) : nil }
+                        .compactMap { $0.isVisible ? $0.scrollViewWillBeginDecelerating?(scrollView, nil) : nil }
         }
     }
 
@@ -165,12 +180,12 @@ extension GGTableViewDelegateProxy {
         }
         if let tv = scrollView as? UITableView, let proxy = tv.delegate as? GGTableViewDelegateProxy {
             _ = proxy.dataSource.allRows
-                        .compactMap { $0.isVisiable ? $0.scrollViewDidEndDecelerating?(scrollView, nil) : nil }
+                        .compactMap { $0.isVisible ? $0.scrollViewDidEndDecelerating?(scrollView, nil) : nil }
         }
     }
 }
 
-//MARK:- TableViewCell
+// MARK:- TableViewCell
 open class GGTableViewCell: UITableViewCell {
     
     open func configSubviews() {
@@ -189,7 +204,7 @@ open class GGTableViewCell: UITableViewCell {
 
 
 
-//MARK:- base class GGNode
+// MARK:- base class GGNode
 public protocol GGNodeProtocol {
     var indexPath: IndexPath { get set }
     var tableView: UITableView? { get set }
@@ -211,7 +226,7 @@ open class GGNode<Element>: GGNodeProtocol where Element: GGNodeProtocol {
         didSet {
             semaphore.wait()
             for idx in 0..<items.count {
-                items[safe: idx].tableView = self.tableView
+                items[safe: idx].tableView = tableView
             }
             semaphore.signal()
         }
@@ -246,7 +261,7 @@ extension GGNode {
         let index = items.count
         items.append(item)
         var temp = items[safe: index]
-        temp.indexPath = IndexPath(row: index, section: self.indexPath.row)
+        temp.indexPath = IndexPath(row: index, section: indexPath.row)
         temp.tableView = tableView
         semaphore.signal()
     }
@@ -270,7 +285,7 @@ extension GGNode {
     }
 }
 
-//MARK:- row
+// MARK:- row
 open class GGTableViewRow: GGNodeProtocol {
     public weak var tableView: UITableView?
     
@@ -292,6 +307,9 @@ open class GGTableViewRow: GGNodeProtocol {
     public var didDeselectRow: GGTableViewProxyBlock?
     public var willDisplayCell: GGTableViewProxyBlock?
     public var didEndDisplayingCell: GGTableViewProxyBlock?
+    public var canEditRow = false
+    public var commitEditingStyle: ((UITableView, UITableViewCell.EditingStyle, IndexPath) -> Void)?
+    public var titleForDeleteConfirmationButton: String?
     
     public var scrollViewDidScroll: GGTableViewScrollBlock?
     public var scrollViewWillBeginDragging: GGTableViewScrollBlock?
@@ -312,10 +330,10 @@ open class GGTableViewRow: GGNodeProtocol {
         }
     }
     
-    public var isVisiable = false
+    public var isVisible = false
 }
 
-//MARK:- section
+// MARK:- section
 open class GGTableViewSection: GGNode<GGTableViewRow> {
     
     open var sectionHeaderView: UIView?
@@ -366,7 +384,7 @@ open class GGTableViewDataSource: GGNode<GGTableViewSection> {
     }
 }
 
-//MARK:- Array subscript extension
+// MARK:- Array subscript extension
 extension Array {
     subscript(safe index: Int) -> Element {
         get {
