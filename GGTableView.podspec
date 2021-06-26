@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'GGTableView'
-  s.version          = '0.2.4'
+  s.version          = '0.2.5'
   s.summary          = 'This pod just provides a simpler, maybe, way to use UITableView.'
 
 # This description is used to generate tags and improve search results.

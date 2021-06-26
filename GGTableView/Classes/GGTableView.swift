@@ -208,7 +208,6 @@ open class GGTableViewCell: UITableViewCell {
 public protocol GGNodeProtocol {
     var indexPath: IndexPath { get set }
     var tableView: UITableView? { get set }
-    
 }
 
 open class GGNode<Element>: GGNodeProtocol where Element: GGNodeProtocol {
@@ -222,15 +221,7 @@ open class GGNode<Element>: GGNodeProtocol where Element: GGNodeProtocol {
      */
     public var indexPath = IndexPath(row: 0, section: 0)
     
-    public weak var tableView: UITableView? {
-        didSet {
-            semaphore.wait()
-            for idx in 0..<items.count {
-                items[safe: idx].tableView = tableView
-            }
-            semaphore.signal()
-        }
-    }
+    public weak var tableView: UITableView?
     
     private var items = [Element]()
     
@@ -256,25 +247,34 @@ extension GGNode {
         items
     }
     
-    func add(item: Element) {
+    func add(element: Element) {
+        add(elements: [element])
+    }
+    
+    func add(elements: [Element]) {
         semaphore.wait()
-        let index = items.count
-        items.append(item)
-        var temp = items[safe: index]
-        temp.indexPath = IndexPath(row: index, section: indexPath.row)
-        temp.tableView = tableView
+        let index = count
+        items.append(contentsOf: elements)
+        var temp: Element
+        for i in 0..<elements.count {
+            let rowIdx = i + index
+            temp = self[rowIdx]
+            temp.indexPath = IndexPath(row: rowIdx, section: indexPath.row)
+            temp.tableView = tableView
+        }
         semaphore.signal()
     }
     
-    func add(items: [Element]) {
+    func remove(element: Element) {
         semaphore.wait()
-        self.items.append(contentsOf: items)
-        semaphore.signal()
-    }
-    
-    func remove(item: Element) {
-        semaphore.wait()
-        items.remove(safe: item.indexPath.row)
+        let indexPath = element.indexPath
+        items.remove(safe: indexPath.row)
+        var temp: Element
+        for i in 0..<(count - indexPath.row) {
+            let rowIdx = indexPath.row + i
+            temp = self[rowIdx]
+            temp.indexPath = IndexPath(row: rowIdx, section: indexPath.row)
+        }
         semaphore.signal()
     }
     
@@ -284,9 +284,15 @@ extension GGNode {
         semaphore.signal()
     }
     
-    func insert(items: [Element], at idx: Int) {
+    func insert(elements: [Element], at idx: Int) {
         semaphore.wait()
-        self.items.insert(contentsOf: items, at: idx)
+        items.insert(contentsOf: elements, at: idx)
+        var temp: Element
+        for i in 0..<(count - idx) {
+            temp = self[idx]
+            temp.indexPath = IndexPath(row: idx + i, section: indexPath.row)
+            temp.tableView = tableView
+        }
         semaphore.signal()
     }
 }
@@ -352,19 +358,19 @@ open class GGTableViewSection: GGNode<GGTableViewRow> {
     }
     
     public func add(row: GGTableViewRow) {
-        super.add(item: row)
+        super.add(element: row)
     }
     
     public func add(rows: [GGTableViewRow]) {
-        super.add(items: rows)
+        super.add(elements: rows)
     }
     
     public func remove(row: GGTableViewRow) {
-        super.remove(item: row)
+        super.remove(element: row)
     }
     
     public func insert(rows: [GGTableViewRow], at idx: Int) {
-        super.insert(items: rows, at: idx)
+        super.insert(elements: rows, at: idx)
     }
     
     public func insert(row: GGTableViewRow, at idx: Int) {
@@ -386,19 +392,19 @@ open class GGTableViewDataSource: GGNode<GGTableViewSection> {
     }
     
     public func add(section: GGTableViewSection) {
-        super.add(item: section)
+        super.add(element: section)
     }
     
     public func add(sections: [GGTableViewSection]) {
-        super.add(items: sections)
+        super.add(elements: sections)
     }
     
     public func remove(section: GGTableViewSection) {
-        super.remove(item: section)
+        super.remove(element: section)
     }
     
     public func insert(sections: [GGTableViewSection], at idx: Int) {
-        super.insert(items: sections, at: idx)
+        super.insert(elements: sections, at: idx)
     }
     
     public func insert(section: GGTableViewSection, at idx: Int) {
