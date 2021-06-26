@@ -266,10 +266,10 @@ extension GGNode {
         semaphore.signal()
     }
     
-    func add(items: Array<Element>) {
-        for idx in 0..<items.count {
-            add(item: items[safe: idx])
-        }
+    func add(items: [Element]) {
+        semaphore.wait()
+        self.items.append(contentsOf: items)
+        semaphore.signal()
     }
     
     func remove(item: Element) {
@@ -281,6 +281,12 @@ extension GGNode {
     public func removeAll() {
         semaphore.wait()
         items.removeAll()
+        semaphore.signal()
+    }
+    
+    func insert(items: [Element], at idx: Int) {
+        semaphore.wait()
+        self.items.insert(contentsOf: items, at: idx)
         semaphore.signal()
     }
 }
@@ -349,12 +355,20 @@ open class GGTableViewSection: GGNode<GGTableViewRow> {
         super.add(item: row)
     }
     
-    public func add(rows: Array<GGTableViewRow>) {
+    public func add(rows: [GGTableViewRow]) {
         super.add(items: rows)
     }
     
     public func remove(row: GGTableViewRow) {
         super.remove(item: row)
+    }
+    
+    public func insert(rows: [GGTableViewRow], at idx: Int) {
+        super.insert(items: rows, at: idx)
+    }
+    
+    public func insert(row: GGTableViewRow, at idx: Int) {
+        insert(rows: [row], at: idx)
     }
 }
 
@@ -375,12 +389,20 @@ open class GGTableViewDataSource: GGNode<GGTableViewSection> {
         super.add(item: section)
     }
     
-    public func add(sections: Array<GGTableViewSection>) {
+    public func add(sections: [GGTableViewSection]) {
         super.add(items: sections)
     }
     
     public func remove(section: GGTableViewSection) {
         super.remove(item: section)
+    }
+    
+    public func insert(sections: [GGTableViewSection], at idx: Int) {
+        super.insert(items: sections, at: idx)
+    }
+    
+    public func insert(section: GGTableViewSection, at idx: Int) {
+        insert(sections: [section], at: idx)
     }
 }
 
